@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Sparkles } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Loader2, Mail, Lock, User, Sparkles, ArrowLeft } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 
 export default function SignupPage() {
@@ -22,8 +22,8 @@ export default function SignupPage() {
 
     if (password !== confirmPassword) {
       toast({
-        title: '密碼不符',
-        description: '兩次輸入的密碼不一致',
+        title: '密碼不匹配',
+        description: '請確認兩次輸入的密碼相同',
         variant: 'destructive',
       })
       return
@@ -54,11 +54,12 @@ export default function SignupPage() {
       }
 
       toast({
-        title: '註冊成功',
-        description: '請檢查您的郵箱以驗證帳號',
+        title: '註冊成功 ✨',
+        description: '歡迎加入我們！',
       })
 
-      router.push('/login')
+      router.push('/generate')
+      router.refresh()
     } catch (error) {
       toast({
         title: '註冊失敗',
@@ -71,66 +72,112 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
-          </div>
-          <CardTitle className="text-2xl text-center">創建帳號</CardTitle>
-          <CardDescription className="text-center">
-            註冊即可開始免費使用 AI 圖片生成
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">電子郵件</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* 背景裝飾 */}
+      <div className="fixed inset-0 -z-10 pattern-dots opacity-30" />
+      <div className="fixed top-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -z-10 float-animation" />
+      <div className="fixed bottom-20 left-20 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl -z-10 float-animation" style={{ animationDelay: '3s' }} />
+      
+      <div className="w-full max-w-md">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-purple-500 transition-colors mb-8">
+          <ArrowLeft className="h-4 w-4" />
+          返回首頁
+        </Link>
+
+        <Card className="glass-effect border-2 rounded-3xl colorful-shadow">
+          <CardHeader className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto glow-effect">
+              <Sparkles className="h-8 w-8 text-white" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">密碼</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="至少 6 個字符"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <div>
+              <CardTitle className="text-3xl font-bold">
+                <span className="gradient-text">開始創作</span>
+              </CardTitle>
+              <CardDescription className="text-base mt-2">
+                註冊帳號，釋放你的創意潛能
+              </CardDescription>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">確認密碼</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="再次輸入密碼"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-base font-semibold flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-purple-500" />
+                  電子郵件
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="rounded-2xl h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-base font-semibold flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-purple-500" />
+                  密碼
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="至少 6 個字符"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="rounded-2xl h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-base font-semibold flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-purple-500" />
+                  確認密碼
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="再次輸入密碼"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="rounded-2xl h-12"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full gradient-button text-lg py-6 rounded-2xl"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    註冊中...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    立即註冊
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                已有帳號？{' '}
+                <Link href="/login" className="text-purple-500 hover:text-purple-600 font-semibold">
+                  立即登入
+                </Link>
+              </p>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? '註冊中...' : '註冊'}
-            </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              已有帳號？{' '}
-              <Link href="/login" className="text-primary hover:underline">
-                立即登入
-              </Link>
-            </p>
-          </CardFooter>
-        </form>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }

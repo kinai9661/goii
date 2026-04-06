@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export const dynamic = 'force-dynamic'
 import { Slider } from '@/components/ui/slider'
-import { Loader2, Sparkles, Download } from 'lucide-react'
+import { Loader2, Sparkles, Download, Wand2, Image as ImageIcon, Palette, Zap } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import Image from 'next/image'
 
@@ -76,10 +76,10 @@ export default function GeneratePage() {
 
       setGeneratedImage(data.image_url)
       setGenerationId(data.id)
-
+      
       toast({
-        title: '生成成功',
-        description: '您的圖片已生成完成',
+        title: '生成成功！',
+        description: '您的圖片已生成',
       })
     } catch (error) {
       toast({
@@ -101,16 +101,11 @@ export default function GeneratePage() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `ai-generated-${generationId || Date.now()}.png`
+      a.download = `ai-generated-${Date.now()}.png`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-
-      toast({
-        title: '下載成功',
-        description: '圖片已保存到您的設備',
-      })
     } catch (error) {
       toast({
         title: '下載失敗',
@@ -121,136 +116,170 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* 背景裝飾 */}
+      <div className="fixed inset-0 -z-10 pattern-dots opacity-30" />
+      <div className="fixed top-20 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -z-10 float-animation" />
+      <div className="fixed bottom-20 left-20 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl -z-10 float-animation" style={{ animationDelay: '3s' }} />
+      
       <Navbar />
       
       <main className="flex-1 container py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <span className="gradient-text">創作你的藝術</span>
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            用文字描述你的想像，讓 AI 為你實現 ✨
+          </p>
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Left Panel - Controls */}
+          {/* 左側：控制面板 */}
           <div className="space-y-6">
-            <Card>
+            <Card className="glass-effect border-2 rounded-3xl colorful-shadow">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5" />
-                  生成設置
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Wand2 className="h-6 w-6 text-purple-500" />
+                  創作設定
                 </CardTitle>
                 <CardDescription>
-                  調整參數以生成您想要的圖片
+                  調整參數，打造完美作品
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* 提示詞 */}
                 <div className="space-y-2">
-                  <Label htmlFor="prompt">提示詞 *</Label>
+                  <Label htmlFor="prompt" className="text-base font-semibold flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    提示詞
+                  </Label>
                   <Textarea
                     id="prompt"
-                    placeholder="描述您想要生成的圖片，例如：a beautiful sunset over mountains"
+                    placeholder="描述你想要的圖片，例如：一隻可愛的貓咪在星空下..."
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     rows={4}
+                    className="rounded-2xl resize-none"
                   />
                 </div>
 
+                {/* 負面提示詞 */}
                 <div className="space-y-2">
-                  <Label htmlFor="negativePrompt">負面提示詞</Label>
+                  <Label htmlFor="negative" className="text-base font-semibold">
+                    負面提示詞（選填）
+                  </Label>
                   <Textarea
-                    id="negativePrompt"
-                    placeholder="描述您不想要的元素，例如：blurry, low quality"
+                    id="negative"
+                    placeholder="描述你不想要的元素..."
                     value={negativePrompt}
                     onChange={(e) => setNegativePrompt(e.target.value)}
                     rows={2}
+                    className="rounded-2xl resize-none"
                   />
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="model">模型</Label>
-                    <Select value={model} onValueChange={setModel}>
-                      <SelectTrigger id="model">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MODELS.map((m) => (
-                          <SelectItem key={m.value} value={m.value}>
-                            {m.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="style">風格</Label>
-                    <Select value={style} onValueChange={setStyle}>
-                      <SelectTrigger id="style">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STYLES.map((s) => (
-                          <SelectItem key={s.value} value={s.value}>
-                            {s.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="width">寬度: {width}px</Label>
-                    <Slider
-                      id="width"
-                      min={512}
-                      max={1024}
-                      step={64}
-                      value={[width]}
-                      onValueChange={(v) => setWidth(v[0])}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="height">高度: {height}px</Label>
-                    <Slider
-                      id="height"
-                      min={512}
-                      max={1024}
-                      step={64}
-                      value={[height]}
-                      onValueChange={(v) => setHeight(v[0])}
-                    />
-                  </div>
-                </div>
-
+                {/* 模型選擇 */}
                 <div className="space-y-2">
-                  <Label htmlFor="steps">推理步數: {steps}</Label>
+                  <Label className="text-base font-semibold flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-purple-500" />
+                    AI 模型
+                  </Label>
+                  <Select value={model} onValueChange={setModel}>
+                    <SelectTrigger className="rounded-2xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MODELS.map((m) => (
+                        <SelectItem key={m.value} value={m.value}>
+                          {m.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 風格選擇 */}
+                <div className="space-y-2">
+                  <Label className="text-base font-semibold flex items-center gap-2">
+                    <Palette className="h-4 w-4 text-purple-500" />
+                    藝術風格
+                  </Label>
+                  <Select value={style} onValueChange={setStyle}>
+                    <SelectTrigger className="rounded-2xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STYLES.map((s) => (
+                        <SelectItem key={s.value} value={s.value}>
+                          {s.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 尺寸 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">
+                      寬度: {width}px
+                    </Label>
+                    <Slider
+                      value={[width]}
+                      onValueChange={([v]) => setWidth(v)}
+                      min={512}
+                      max={1024}
+                      step={64}
+                      className="py-4"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">
+                      高度: {height}px
+                    </Label>
+                    <Slider
+                      value={[height]}
+                      onValueChange={([v]) => setHeight(v)}
+                      min={512}
+                      max={1024}
+                      step={64}
+                      className="py-4"
+                    />
+                  </div>
+                </div>
+
+                {/* 步數 */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">
+                    生成步數: {steps}
+                  </Label>
                   <Slider
-                    id="steps"
+                    value={[steps]}
+                    onValueChange={([v]) => setSteps(v)}
                     min={20}
                     max={50}
                     step={5}
-                    value={[steps]}
-                    onValueChange={(v) => setSteps(v[0])}
+                    className="py-4"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    步數越多，質量越高，但生成時間越長
-                  </p>
                 </div>
 
+                {/* 生成按鈕 */}
                 <Button
                   onClick={handleGenerate}
-                  disabled={loading}
-                  className="w-full"
+                  disabled={loading || !prompt.trim()}
+                  className="w-full gradient-button text-lg py-6 rounded-2xl group"
                   size="lg"
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      生成中...
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      魔法生成中...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      生成圖片
+                      <Sparkles className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+                      開始創作
                     </>
                   )}
                 </Button>
@@ -258,41 +287,38 @@ export default function GeneratePage() {
             </Card>
           </div>
 
-          {/* Right Panel - Preview */}
+          {/* 右側：預覽區域 */}
           <div className="space-y-6">
-            <Card>
+            <Card className="glass-effect border-2 rounded-3xl colorful-shadow">
               <CardHeader>
-                <CardTitle>預覽</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <ImageIcon className="h-6 w-6 text-purple-500" />
+                  作品預覽
+                </CardTitle>
                 <CardDescription>
-                  生成的圖片將顯示在這裡
+                  你的創作將在這裡呈現
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="aspect-square relative bg-muted rounded-lg overflow-hidden">
+                <div className="aspect-square rounded-2xl bg-muted/50 flex items-center justify-center overflow-hidden relative">
                   {loading ? (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center space-y-4">
-                        <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-                        <p className="text-sm text-muted-foreground">
-                          正在生成您的圖片...
-                        </p>
-                      </div>
+                    <div className="flex flex-col items-center gap-4">
+                      <Loader2 className="h-16 w-16 animate-spin text-purple-500" />
+                      <p className="text-sm text-muted-foreground">AI 正在創作中...</p>
                     </div>
                   ) : generatedImage ? (
                     <Image
                       src={generatedImage}
-                      alt="Generated image"
+                      alt="Generated"
                       fill
                       className="object-contain"
                     />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center space-y-2">
-                        <Sparkles className="h-12 w-12 mx-auto text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">
-                          輸入提示詞並點擊生成
-                        </p>
-                      </div>
+                    <div className="text-center p-8">
+                      <Sparkles className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        輸入提示詞，開始你的創作之旅
+                      </p>
                     </div>
                   )}
                 </div>
@@ -301,11 +327,19 @@ export default function GeneratePage() {
                   <div className="mt-4 flex gap-2">
                     <Button
                       onClick={handleDownload}
+                      className="flex-1 rounded-2xl"
                       variant="outline"
-                      className="flex-1"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       下載圖片
+                    </Button>
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={loading}
+                      className="flex-1 gradient-button rounded-2xl"
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      重新生成
                     </Button>
                   </div>
                 )}
