@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
           image_url: result.images[0].url,
           generation_time: result.generation_time,
           credits_used: result.credits_used,
-        })
+        } as any)
         .eq('id', generation.id)
 
       // 7. 更新用戶統計
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
           daily_generations: isToday ? profile.daily_generations + 1 : 1,
           last_generation_date: today,
           total_generations: (profile.total_generations || 0) + 1,
-        })
+        } as any)
         .eq('id', user.id)
 
       // 8. 返回結果
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         .update({
           status: 'failed',
           error_message: aiError.message,
-        })
+        } as any)
         .eq('id', generation.id)
 
       throw aiError
