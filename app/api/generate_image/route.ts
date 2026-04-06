@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // 5. 呼叫 AI 生成
-      const result = await generateImage(validatedData)
+      const result = await generateImage(validatedData as any)
 
       // 6. 更新生成記錄
       await supabase
