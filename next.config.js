@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -11,11 +13,6 @@ const nextConfig = {
         hostname: 'replicate.delivery',
       },
     ],
-  },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000'],
-    },
   },
 }
 
