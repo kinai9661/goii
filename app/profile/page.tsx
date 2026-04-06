@@ -29,7 +29,6 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [username, setUsername] = useState('')
   const [fullName, setFullName] = useState('')
-  const supabase = createClient()
 
   useEffect(() => {
     loadProfile()
@@ -53,6 +52,7 @@ export default function ProfilePage() {
   }
 
   const handleSave = async () => {
+    const supabase = createClient()
     setSaving(true)
 
     try {
