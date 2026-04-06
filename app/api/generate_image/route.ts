@@ -17,6 +17,7 @@ const generateSchema = z.object({
 type ProfileData = {
   daily_generations: number
   last_generation_date: string
+  total_generations?: number
 }
 
 const DAILY_LIMIT = 10
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. 建立生成記錄
-    const { data: generation } = await supabase
+    const { data: generation, error: insertError } = await supabase
       .from('generations')
       .insert({
         user_id: user.id,
@@ -78,11 +79,11 @@ export async function POST(request: NextRequest) {
         style: validatedData.style,
         seed: validatedData.seed,
         status: 'processing',
-      })
+      } as any)
       .select()
       .single()
 
-    if (!generation) {
+    if (insertError || !generation) {
       return NextResponse.json(
         { success: false, error: 'Failed to create generation record' },
         { status: 500 }
