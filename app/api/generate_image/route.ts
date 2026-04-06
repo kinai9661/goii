@@ -34,13 +34,13 @@ export async function POST(request: NextRequest) {
     const validatedData = generateSchema.parse(body)
 
     // 3. 檢查每日限制
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('daily_generations, last_generation_date')
       .eq('id', user.id)
       .single()
 
-    if (!profile) {
+    if (profileError || !profile) {
       return NextResponse.json(
         { success: false, error: 'Profile not found' },
         { status: 404 }
