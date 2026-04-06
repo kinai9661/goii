@@ -14,6 +14,11 @@ const generateSchema = z.object({
   seed: z.number().optional(),
 })
 
+type ProfileData = {
+  daily_generations: number
+  last_generation_date: string
+}
+
 const DAILY_LIMIT = 10
 
 export async function POST(request: NextRequest) {
@@ -38,7 +43,7 @@ export async function POST(request: NextRequest) {
       .from('profiles')
       .select('daily_generations, last_generation_date')
       .eq('id', user.id)
-      .single()
+      .single<ProfileData>()
 
     if (profileError || !profile) {
       return NextResponse.json(
