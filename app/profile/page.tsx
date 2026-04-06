@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, User as UserIcon } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/client'
 
 interface Profile {

@@ -8,6 +8,8 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 type Generation = Database['public']['Tables']['generations']['Row']
 
 export default function GalleryPage() {
