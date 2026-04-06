@@ -95,24 +95,26 @@ export async function POST(request: NextRequest) {
       const result = await generateImage(validatedData as any)
 
       // 6. 更新生成記錄
+      const updateData: any = {
+        status: result.status,
+        image_url: result.images[0].url,
+        generation_time: result.generation_time,
+        credits_used: result.credits_used,
+      }
       await supabase
         .from('generations')
-        .update({
-          status: result.status,
-          image_url: result.images[0].url,
-          generation_time: result.generation_time,
-          credits_used: result.credits_used,
-        } as any)
+        .update(updateData)
         .eq('id', generation.id)
 
       // 7. 更新用戶統計
+      const profileUpdateData: any = {
+        daily_generations: isToday ? profile.daily_generations + 1 : 1,
+        last_generation_date: today,
+        total_generations: (profile.total_generations || 0) + 1,
+      }
       await supabase
         .from('profiles')
-        .update({
-          daily_generations: isToday ? profile.daily_generations + 1 : 1,
-          last_generation_date: today,
-          total_generations: (profile.total_generations || 0) + 1,
-        } as any)
+        .update(profileUpdateData)
         .eq('id', user.id)
 
       // 8. 返回結果
@@ -128,12 +130,13 @@ export async function POST(request: NextRequest) {
 
     } catch (aiError: any) {
       // 更新失敗狀態
+      const errorUpdateData: any = {
+        status: 'failed',
+        error_message: aiError.message,
+      }
       await supabase
         .from('generations')
-        .update({
-          status: 'failed',
-          error_message: aiError.message,
-        } as any)
+        .update(errorUpdateData)
         .eq('id', generation.id)
 
       throw aiError
